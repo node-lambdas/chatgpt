@@ -11,20 +11,18 @@ export default {
     ask: {
       default: true,
       description: "Ask ChatGPT a question",
-      credentials: ["authorization"],
+      credentials: ["apiKey"],
       input: "text",
       output: "text",
       async handler(request, response) {
-        const apiKey = request.credentials.authorization;
+        const apiKey = request.credentials.apiKey;
 
         if (!apiKey) {
           response.reject(401, "Invalid API key");
           return;
         }
 
-        console.log(request.options, request.body);
         const openai = new OpenAIApi(new Configuration({ apiKey }));
-
         try {
           const chat = await openai.createChatCompletion({
             model: request.options.model || defaultModel,
@@ -41,11 +39,11 @@ export default {
     },
     complete: {
       description: "Ask ChatGPT for a completion",
-      credentials: ["authorization"],
+      credentials: ["apiKey"],
       input: "json",
       output: "json",
       async handler(request, response) {
-        const apiKey = request.credentials.authorization;
+        const apiKey = request.credentials.apiKey;
 
         if (!apiKey) {
           response.reject(401, "Invalid API key");
@@ -54,7 +52,6 @@ export default {
 
         const openai = new OpenAIApi(new Configuration({ apiKey }));
         const input = request.body;
-        console.log(request.options, request.body);
 
         if (!Array.isArray(input) || !input.every(validateMessage)) {
           response.writeHead(400);
@@ -70,7 +67,9 @@ export default {
 
           const output = input.concat({
             role: "assistant",
-            content: chat.data.choices.map((c) => c.message.content),
+            content: chat.data.choices
+              .map((c) => c.message.content.trim())
+              .join(","),
           });
 
           response.send(200, output);
