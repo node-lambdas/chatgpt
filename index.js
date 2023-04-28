@@ -1,5 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 
+const defaultModel = 'gpt-3.5-turbo';
+
 export default {
   version: 2,
   actions: {
