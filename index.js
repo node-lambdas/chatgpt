@@ -17,7 +17,7 @@ export default {
       async handler(request, response) {
         const apiKey = request.headers.authorization;
         const openai = new OpenAIApi(new Configuration({ apiKey }));
-
+        console.log(apiKey, request.body);
         try {
           const chat = await openai.createChatCompletion({
             model: request.options.model || defaultModel,
@@ -41,6 +41,7 @@ export default {
         const apiKey = request.headers.authorization;
         const openai = new OpenAIApi(new Configuration({ apiKey }));
         const input = request.body;
+        console.log(apiKey, input);
 
         if (!Array.isArray(input) || !input.every(validateMessage)) {
           response.writeHead(400);
