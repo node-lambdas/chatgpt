@@ -15,9 +15,16 @@ export default {
       input: "text",
       output: "text",
       async handler(request, response) {
-        const apiKey = request.headers.authorization;
+        const apiKey = request.credentials.authorization;
+
+        if (!apiKey) {
+          response.reject(401, "Invalid API key");
+          return;
+        }
+
+        console.log(request.options, request.body);
         const openai = new OpenAIApi(new Configuration({ apiKey }));
-        console.log(apiKey, request.body);
+
         try {
           const chat = await openai.createChatCompletion({
             model: request.options.model || defaultModel,
@@ -38,10 +45,16 @@ export default {
       input: "json",
       output: "json",
       async handler(request, response) {
-        const apiKey = request.headers.authorization;
+        const apiKey = request.credentials.authorization;
+
+        if (!apiKey) {
+          response.reject(401, "Invalid API key");
+          return;
+        }
+
         const openai = new OpenAIApi(new Configuration({ apiKey }));
         const input = request.body;
-        console.log(apiKey, input);
+        console.log(request.options, request.body);
 
         if (!Array.isArray(input) || !input.every(validateMessage)) {
           response.writeHead(400);
